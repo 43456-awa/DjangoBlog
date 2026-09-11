@@ -1,5 +1,15 @@
 # DjangoBlog
 
+> **本项目为课程实践项目**：基于开源博客系统 DjangoBlog（作者 liangliangyy）的**二次开发版本**，遵循 GPL-3.0 协议，保留原作者版权。
+>
+> | 项 | 说明 |
+> |---|---|
+> | 本仓库 | https://github.com/43456-awa/DjangoBlog |
+> | 上游仓库 | https://github.com/liangliangyy/DjangoBlog |
+> | 分支约定 | `master` 保存稳定版本；成员分支按「姓名首字母_branch」命名（如 `zyc_branch`） |
+> | 目录约定 | `doc/` 存放报告文档；`src/` 存放小组自主开发代码（源码结构沿用上游，见 `src/README.md`） |
+> | 项目文档 | [`doc/项目说明.md`](doc/项目说明.md) |
+
 <p align="center">
   <a href="https://github.com/liangliangyy/DjangoBlog/actions/workflows/django.yml"><img src="https://github.com/liangliangyy/DjangoBlog/actions/workflows/django.yml/badge.svg" alt="Django CI"></a>
   <a href="https://github.com/liangliangyy/DjangoBlog/actions/workflows/frontend.yml"><img src="https://github.com/liangliangyy/DjangoBlog/actions/workflows/frontend.yml/badge.svg" alt="Frontend CI"></a>
