@@ -32,6 +32,7 @@ function getPreferredTheme() {
  * 应用主题
  */
 function applyTheme(theme) {
+    document.documentElement.classList.toggle('dark', theme === 'dark');
     if (theme === 'dark') {
         document.documentElement.setAttribute(THEME_ATTR, 'dark');
         document.body.setAttribute(THEME_ATTR, 'dark');

@@ -1,22 +1,22 @@
 {% load blog_tags %}
 {% load i18n %}
 
-<header class="sticky top-0 z-50 border-b border-border/60 dark:border-white/[0.08] bg-background/80 backdrop-blur-xl"
+<header class="notebook-header sticky top-0 z-50 border-b border-border/60 dark:border-white/[0.08] bg-background/80 backdrop-blur-xl"
         @keydown.ctrl.k.window.prevent="document.getElementById('header-search-input')?.focus()"
         @keydown.meta.k.window.prevent="document.getElementById('header-search-input')?.focus()">
     {# Skip to content link for accessibility #}
     <a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[200] focus:rounded-lg focus:bg-primary focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-primary-foreground focus:shadow-lg">
         {% trans 'Skip to content' %}
     </a>
-    <div class="mx-auto flex max-w-6xl items-center gap-6 px-4 py-3 lg:px-6">
+    <div class="notebook-nav-inner mx-auto flex max-w-6xl items-center gap-6 px-4 py-3 lg:px-6">
 
         {# Logo #}
-        <a href="/" class="group flex flex-col items-end leading-none">
-            <span class="text-2xl sm:text-3xl lg:text-[2.125rem] font-bold tracking-tight text-foreground transition-colors group-hover:text-primary">
-                {{ SITE_NAME }}
+        <a href="/" class="notebook-brand group flex flex-col leading-none">
+            <span class="notebook-wordmark text-foreground">
+                {{ SITE_NAME }}<span class="notebook-brand-dot" aria-hidden="true">.</span>
             </span>
             {% if SITE_DESCRIPTION %}
-            <span class="text-[11px] text-muted-foreground tracking-wide">
+            <span class="notebook-brand-description text-muted-foreground">
                 {{ SITE_DESCRIPTION }}
             </span>
             {% endif %}
@@ -114,7 +114,7 @@
 
         {# Desktop inline search bar #}
         <form action="{% url 'search' %}" method="get"
-              class="hidden lg:flex items-center gap-2 h-9 w-44 rounded-lg border border-border bg-secondary/60 px-3 transition-all duration-300 focus-within:w-56 focus-within:border-primary/40 focus-within:bg-background focus-within:ring-2 focus-within:ring-primary/20">
+              class="notebook-search hidden lg:flex items-center gap-2 h-9 w-44 rounded-lg border border-border bg-secondary/60 px-3 transition-all duration-300 focus-within:border-primary/40 focus-within:bg-background focus-within:ring-2 focus-within:ring-primary/20">
             <svg class="size-4 shrink-0 text-muted-foreground pointer-events-none"
                  fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -132,7 +132,7 @@
         <div class="ml-auto flex items-center gap-0.5 lg:ml-0">
             {# Theme toggle #}
             <button class="size-9 rounded-lg text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
-                    @click="window.themeManager && window.themeManager.toggle()"
+                    @click="(window.DarkMode || window.themeManager).toggle()"
                     aria-label="{% trans 'Toggle theme' %}">
                 {# Moon — shown in light mode #}
                 <svg class="size-[18px] mx-auto theme-icon-moon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
