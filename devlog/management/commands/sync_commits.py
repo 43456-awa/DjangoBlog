@@ -168,8 +168,9 @@ class Command(BaseCommand):
             repo=cfg['name'], sha=entry['sha'], defaults=defaults
         )
         if created:
-            # 私有仓库默认不展示摘要文字；敏感词命中则整条不展示
-            obj.show_summary = not private
+            # 展示 commit 标题本身是允许的（敏感词命中则整条不展示）；
+            # 但「改了哪些文件、增删多少行」只对公开仓库显示，见模板
+            obj.show_summary = True
             obj.is_public = not blocked
             obj.save(update_fields=['show_summary', 'is_public'])
             return True
