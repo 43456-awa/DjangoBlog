@@ -6,6 +6,8 @@ from django.utils import timezone
 
 from .models import GitCommit
 
+HEATMAP_WEEKS = 53
+
 
 def _local_date(dt):
     """本项目 USE_TZ=False，库里存的就是本地时间，直接取日期即可。"""
@@ -35,18 +37,28 @@ def changelog(request):
     latest = commits.first()
 
     today = date.today()
-    start = today - timedelta(days=today.weekday() + 84)
+    start = today - timedelta(days=today.weekday() + (HEATMAP_WEEKS - 1) * 7)
     daily = Counter()
-    for dt in commits.values_list('committed_at', flat=True):
-        day = _local_date(dt)
+    details = {}
+    for commit in commits:
+        day = _local_date(commit.committed_at)
         if day >= start:
             daily[day] += 1
+            summary = commit.visible_summary
+            if summary and len(details.setdefault(day, [])) < 5:
+                details[day].append(summary[:60])
 
     heatmap = []
-    for i in range(91):
+    for i in range(HEATMAP_WEEKS * 7):
         day = start + timedelta(days=i)
         count = daily.get(day, 0)
-        heatmap.append({'date': day, 'count': count, 'level': _level(count)})
+        heatmap.append({
+            'date': day,
+            'count': count,
+            'level': _level(count),
+            'detail': details.get(day, []),
+            'future': day > today,
+        })
 
     groups = OrderedDict()
     for commit in commits[:200]:

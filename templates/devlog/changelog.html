@@ -37,11 +37,17 @@
             </div>
 
             <section class="notebook-heat-card" aria-label="提交密度">
-                <p class="notebook-heat-title">近 13 周提交密度</p>
+                <p class="notebook-heat-title">近一年提交密度</p>
                 <div class="notebook-heat" role="img" aria-label="提交热力图">
                     {% for cell in heatmap %}
-                        <span class="notebook-heat-cell" data-level="{{ cell.level }}"
-                              title="{{ cell.date|date:"Y-m-d" }} · {{ cell.count }} 次提交"></span>
+                        {% if cell.future %}
+                            <span class="notebook-heat-cell is-empty" aria-hidden="true"></span>
+                        {% else %}
+                            <span class="notebook-heat-cell" data-level="{{ cell.level }}"
+                                  data-date="{{ cell.date|date:"Y 年 n 月 j 日" }}"
+                                  data-count="{{ cell.count }}"
+                                  data-detail="{{ cell.detail|join:"||" }}"></span>
+                        {% endif %}
                     {% endfor %}
                 </div>
                 <div class="notebook-heat-legend">
@@ -53,6 +59,7 @@
                     <i class="notebook-heat-cell" data-level="4"></i>
                     <span>多</span>
                 </div>
+                <div class="notebook-heat-tip" id="heatTip" hidden></div>
             </section>
 
             <section class="notebook-timeline" aria-label="提交时间线">
@@ -93,4 +100,53 @@
 
         </div>
     </div>
+
+    <script>
+        (function () {
+            var tip = document.getElementById('heatTip');
+            var heat = document.querySelector('.notebook-heat');
+            if (!tip || !heat) return;
+
+            function hide() { tip.hidden = true; }
+
+            heat.addEventListener('mouseover', function (event) {
+                var cell = event.target.closest('.notebook-heat-cell');
+                if (!cell || cell.classList.contains('is-empty')) { hide(); return; }
+
+                tip.innerHTML = '';
+                var title = document.createElement('strong');
+                title.textContent = cell.dataset.date;
+                tip.appendChild(title);
+
+                var count = parseInt(cell.dataset.count || '0', 10);
+                var meta = document.createElement('span');
+                meta.textContent = count ? count + ' 次提交' : '这一天没有提交';
+                tip.appendChild(meta);
+
+                var items = (cell.dataset.detail || '').split('||').filter(Boolean);
+                if (items.length) {
+                    var list = document.createElement('ul');
+                    items.forEach(function (text) {
+                        var li = document.createElement('li');
+                        li.textContent = text;
+                        list.appendChild(li);
+                    });
+                    tip.appendChild(list);
+                }
+
+                tip.hidden = false;
+                var box = cell.getBoundingClientRect();
+                var left = box.left + window.scrollX + box.width / 2 - tip.offsetWidth / 2;
+                var top = box.top + window.scrollY - tip.offsetHeight - 8;
+                if (top < window.scrollY) {
+                    top = box.bottom + window.scrollY + 8;
+                }
+                tip.style.left = Math.max(8, left) + 'px';
+                tip.style.top = top + 'px';
+            });
+
+            heat.addEventListener('mouseout', hide);
+            window.addEventListener('scroll', hide, {passive: true});
+        })();
+    </script>
 {% endblock %}
