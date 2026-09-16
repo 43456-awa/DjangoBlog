@@ -60,7 +60,8 @@ INSTALLED_APPS = [
     'oauth',
     'servermanager',
     'compressor',
-    'djangoblog'
+    'djangoblog',
+    'devlog'
 ]
 
 MIDDLEWARE = [
@@ -460,4 +461,27 @@ ACTIVE_PLUGINS = [
     'article_recommendation',
     'cloudflare_cache',  # Cloudflare缓存管理插件
 ]
+
+# 开发动态（devlog）：要同步哪些本地仓库的提交
+# path 不存在时会自动跳过（服务器上只有 DjangoBlog 自己那一份）
+# private=True 的仓库默认只展示数量与类型，不展示摘要文字
+COMMIT_FEED_REPOS = [
+    {
+        'name': 'DjangoBlog',
+        'label': 'DjangoBlog',
+        'path': str(BASE_DIR),
+        'private': False,
+        'branches': ['master', 'zyc_branch'],
+        'since': '2026-09-11',
+    },
+]
+
+# 本机其它项目的仓库不写进公开仓库（路径含用户名、会暴露私有项目位置），
+# 放在 djangoblog/commit_feed_local.py（已在 .gitignore 中），不存在时自动忽略
+try:
+    from .commit_feed_local import EXTRA_COMMIT_FEED_REPOS  # noqa: F401
+
+    COMMIT_FEED_REPOS += EXTRA_COMMIT_FEED_REPOS
+except ImportError:
+    pass
 

@@ -1,0 +1,96 @@
+{% extends 'share_layout/base.html' %}
+{% load i18n %}
+
+{% block header %}
+    <title>{% trans '开发动态' %} · {{ SITE_NAME }}</title>
+    <meta name="description" content="{{ SITE_NAME }} 的开发提交记录"/>
+{% endblock %}
+
+{% block content %}
+    <div class="notebook-shell notebook-index mx-auto max-w-6xl px-4 py-4 lg:px-6 lg:py-6">
+        <div class="notebook-changelog">
+
+            <div class="notebook-changelog-head">
+                <div>
+                    <p class="notebook-eyebrow"><span aria-hidden="true"></span> {{ SITE_NAME }} / 开发动态</p>
+                    <h1>最近在写什么</h1>
+                    <p class="notebook-changelog-note">只记录本仓库与本机项目的提交，上游历史已过滤；私有项目的改动细节不会展示。</p>
+                </div>
+                {% if latest %}
+                    <span class="notebook-changelog-latest">最近提交 {{ latest.committed_at|date:"n月j日" }}</span>
+                {% endif %}
+            </div>
+
+            <div class="notebook-stat-grid">
+                <div class="notebook-stat">
+                    <span class="notebook-stat-label">提交总数</span>
+                    <strong class="notebook-stat-value">{{ total }}</strong>
+                </div>
+                <div class="notebook-stat">
+                    <span class="notebook-stat-label">参与项目</span>
+                    <strong class="notebook-stat-value">{{ repo_count }}</strong>
+                </div>
+                <div class="notebook-stat">
+                    <span class="notebook-stat-label">近 7 天</span>
+                    <strong class="notebook-stat-value">{{ week_count }}</strong>
+                </div>
+            </div>
+
+            <section class="notebook-heat-card" aria-label="提交密度">
+                <p class="notebook-heat-title">近 13 周提交密度</p>
+                <div class="notebook-heat" role="img" aria-label="提交热力图">
+                    {% for cell in heatmap %}
+                        <span class="notebook-heat-cell" data-level="{{ cell.level }}"
+                              title="{{ cell.date|date:"Y-m-d" }} · {{ cell.count }} 次提交"></span>
+                    {% endfor %}
+                </div>
+                <div class="notebook-heat-legend">
+                    <span>少</span>
+                    <i class="notebook-heat-cell" data-level="0"></i>
+                    <i class="notebook-heat-cell" data-level="1"></i>
+                    <i class="notebook-heat-cell" data-level="2"></i>
+                    <i class="notebook-heat-cell" data-level="3"></i>
+                    <i class="notebook-heat-cell" data-level="4"></i>
+                    <span>多</span>
+                </div>
+            </section>
+
+            <section class="notebook-timeline" aria-label="提交时间线">
+                {% for day, items in groups %}
+                    <h2 class="notebook-timeline-day">{{ day|date:"Y年n月j日" }}</h2>
+                    <ul class="notebook-timeline-list">
+                        {% for commit in items %}
+                            <li class="notebook-commit">
+                                <div class="notebook-commit-top">
+                                    {% if commit.commit_type %}
+                                        <span class="notebook-commit-type" data-type="{{ commit.commit_type }}">{{ commit.commit_type }}</span>
+                                    {% endif %}
+                                    <span class="notebook-commit-repo">{{ commit.display_repo }}</span>
+                                    {% if commit.visible_summary %}
+                                        <code class="notebook-commit-sha">{{ commit.short_sha }}</code>
+                                    {% endif %}
+                                </div>
+                                {% if commit.visible_summary %}
+                                    <p class="notebook-commit-summary">{{ commit.visible_summary }}</p>
+                                {% else %}
+                                    <p class="notebook-commit-summary is-muted">一次代码更新</p>
+                                {% endif %}
+                                <p class="notebook-commit-meta">
+                                    {{ commit.committed_at|date:"H:i" }}
+                                    {% if not commit.is_private %}
+                                        · {{ commit.files_changed }} 个文件
+                                        · <span class="is-add">+{{ commit.insertions }}</span>
+                                        <span class="is-del">−{{ commit.deletions }}</span>
+                                    {% endif %}
+                                </p>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% empty %}
+                    <p class="notebook-empty">还没有同步任何提交。</p>
+                {% endfor %}
+            </section>
+
+        </div>
+    </div>
+{% endblock %}

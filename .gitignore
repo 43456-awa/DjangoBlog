@@ -88,3 +88,6 @@ img/
 .specify/
 specs/
 .interface-design/
+
+# 本机开发动态的私有仓库配置（含本地路径，不入库）
+djangoblog/commit_feed_local.py
