@@ -193,7 +193,9 @@
                 var target = document.getElementById('day-' + cell.dataset.iso);
                 if (!target) { return; }   /* 这天没有提交，留在浮层提示上 */
                 hide();
-                target.scrollIntoView({block: 'start'});   /* 不用 smooth：部分环境不执行动画，宁可靠 */
+                /* 用 scrollTo 而不是 scrollIntoView：后者在部分环境不生效 */
+                var top = target.getBoundingClientRect().top + window.scrollY - 80;
+                window.scrollTo(0, top);
                 target.classList.add('is-flash');
                 setTimeout(function () { target.classList.remove('is-flash'); }, 1800);
             });
