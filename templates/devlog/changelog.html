@@ -45,6 +45,7 @@
                         {% else %}
                             <span class="notebook-heat-cell" data-level="{{ cell.level }}"
                                   data-date="{{ cell.date|date:"Y 年 n 月 j 日" }}"
+                                  data-iso="{{ cell.date|date:"Y-m-d" }}"
                                   data-count="{{ cell.count }}"
                                   data-detail="{{ cell.detail|join:"||" }}"></span>
                         {% endif %}
@@ -67,7 +68,7 @@
                     近 {{ timeline_days }} 天共 {{ timeline_total }} 条提交{% if timeline_shown < timeline_total %}，此处显示最近 {{ timeline_shown }} 条{% endif %}
                 </p>
                 {% for day, items in groups %}
-                    <h2 class="notebook-timeline-day">{{ day|date:"Y年n月j日" }}</h2>
+                    <h2 class="notebook-timeline-day" id="day-{{ day|date:"Y-m-d" }}">{{ day|date:"Y年n月j日" }}</h2>
                     <ul class="notebook-timeline-list">
                         {% for commit in items %}
                             <li class="notebook-commit">
@@ -156,15 +157,13 @@
 
                 tip.hidden = false;
 
+                // 浮层是 position: fixed，坐标直接用视口坐标，不受祖先定位影响
                 var box = cell.getBoundingClientRect();
-                var viewLeft = window.scrollX;
-                var viewRight = viewLeft + document.documentElement.clientWidth;
-                var left = box.left + viewLeft + box.width / 2 - tip.offsetWidth / 2;
-                left = Math.min(Math.max(viewLeft + 8, left), viewRight - tip.offsetWidth - 8);
-
-                var top = box.top + window.scrollY - tip.offsetHeight - 8;
-                if (top < window.scrollY) {
-                    top = box.bottom + window.scrollY + 8;
+                var left = box.left + box.width / 2 - tip.offsetWidth / 2;
+                left = Math.min(Math.max(8, left), window.innerWidth - tip.offsetWidth - 8);
+                var top = box.top - tip.offsetHeight - 8;
+                if (top < 8) {
+                    top = box.bottom + 8;
                 }
                 tip.style.left = left + 'px';
                 tip.style.top = top + 'px';
@@ -183,12 +182,20 @@
             });
             heat.addEventListener('mouseout', hide);
 
-            /* 触摸屏：手机没有 hover，点一下格子看详情，点空白收起 */
+            /* 点格子：第一次看详情（手机上没有 hover，只能靠点），第二次跳到那一天 */
             heat.addEventListener('click', function (event) {
                 var cell = cellFrom(event);
                 if (!cell) { hide(); return; }
-                if (active === cell) { hide(); } else { show(cell); }
                 event.stopPropagation();
+
+                if (active !== cell) { show(cell); return; }
+
+                var target = document.getElementById('day-' + cell.dataset.iso);
+                if (!target) { return; }   /* 这天没有提交，留在浮层提示上 */
+                hide();
+                target.scrollIntoView({behavior: 'smooth', block: 'start'});
+                target.classList.add('is-flash');
+                setTimeout(function () { target.classList.remove('is-flash'); }, 1800);
             });
             document.addEventListener('click', function (event) {
                 var target = event.target;
