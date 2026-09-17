@@ -224,7 +224,9 @@
 }
 
 /* ---------- 开发动态（/changelog/） ---------- */
-.notebook-changelog { display: grid; gap: 26px; }
+.notebook-changelog { display: grid; gap: 26px; min-width: 0; }
+/* 关键：grid 子项默认 min-width:auto，会被 53 列热力图撑开导致整页横向溢出 */
+.notebook-changelog > * { min-width: 0; }
 .notebook-changelog-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 10px; padding-bottom: 18px; border-bottom: 1px solid rgb(var(--border)); }
 .notebook-changelog-head h1 { margin: 0; font: 600 clamp(26px, 3vw, 36px)/1.5 var(--notebook-serif); letter-spacing: -.04em; }
 .notebook-changelog-note { margin: 12px 0 0; color: rgb(var(--muted-foreground)); font-size: 12px; line-height: 1.9; max-width: 620px; }
@@ -235,7 +237,7 @@
 .notebook-stat-label { color: rgb(var(--muted-foreground)); font-size: 11px; letter-spacing: .06em; }
 .notebook-stat-value { font: 500 26px/1 Georgia, serif; color: rgb(var(--foreground)); }
 
-.notebook-heat-card { padding: 18px 20px; border: 1px solid rgb(var(--border)); border-radius: 14px; background: rgb(var(--card) / .65); }
+.notebook-heat-card { min-width: 0; padding: 18px 20px; border: 1px solid rgb(var(--border)); border-radius: 14px; background: rgb(var(--card) / .65); }
 .notebook-heat-title { margin: 0 0 14px; color: rgb(var(--muted-foreground)); font-size: 11px; letter-spacing: .08em; }
 .notebook-heat { display: grid; grid-auto-flow: column; grid-template-columns: repeat(53, minmax(9px, 1fr)); grid-template-rows: repeat(7, auto); gap: 3px; overflow-x: auto; }
 .notebook-heat-cell { display: block; width: 100%; aspect-ratio: 1 / 1; border-radius: 2px; background: rgb(var(--primary) / .08); }
@@ -250,6 +252,8 @@
 .notebook-heat-cell[data-level="3"] { background: rgb(var(--primary) / .72); }
 .notebook-heat-cell[data-level="4"] { background: rgb(var(--primary)); }
 .notebook-heat-legend { display: flex; align-items: center; gap: 5px; margin-top: 12px; color: rgb(var(--muted-foreground)); font-size: 10px; }
+/* 图例里的方块必须固定尺寸：格子在网格里是 width:100%，放进 flex 会被拉成整行宽 */
+.notebook-heat-legend .notebook-heat-cell { flex: 0 0 11px; width: 11px; height: 11px; aspect-ratio: auto; }
 
 .notebook-timeline-day { margin: 0 0 4px; padding: 14px 0 8px; color: rgb(var(--muted-foreground)); font-size: 12px; letter-spacing: .06em; border-bottom: 1px solid rgb(var(--border)); }
 .notebook-timeline-list { margin: 0 0 8px; padding: 0; list-style: none; }
@@ -268,9 +272,19 @@
 .notebook-commit-meta .is-del { color: #b8501f; }
 
 @media (max-width: 639px) {
+  .notebook-changelog { gap: 18px; }
+  .notebook-changelog-head h1 { font-size: 24px; }
+  .notebook-changelog-note { font-size: 11px; line-height: 1.8; }
   .notebook-stat-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
-  .notebook-stat { padding: 13px 12px; }
-  .notebook-stat-value { font-size: 20px; }
-  .notebook-heat { grid-template-columns: repeat(53, minmax(9px, 1fr)); gap: 2px; }
-  .notebook-heat-tip { max-width: 220px; }
+  .notebook-stat { padding: 12px 10px; gap: 4px; }
+  .notebook-stat-label { font-size: 10px; letter-spacing: .03em; }
+  .notebook-stat-value { font-size: 19px; }
+  .notebook-heat-card { padding: 14px 12px; }
+  .notebook-heat { grid-template-columns: repeat(53, minmax(8px, 1fr)); gap: 2px; padding-bottom: 2px; }
+  .notebook-heat-legend { margin-top: 9px; }
+  .notebook-timeline-day { font-size: 11px; padding: 12px 0 7px; }
+  .notebook-commit { padding: 12px 0; }
+  .notebook-commit-summary { font-size: 13px; line-height: 1.8; }
+  .notebook-commit-top { gap: 7px; }
+  .notebook-heat-tip { max-width: 220px; padding: 9px 11px; }
 }
