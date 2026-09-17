@@ -75,7 +75,13 @@
                                     {% if commit.commit_type %}
                                         <span class="notebook-commit-type" data-type="{{ commit.commit_type }}">{{ commit.commit_type }}</span>
                                     {% endif %}
-                                    <span class="notebook-commit-repo">{{ commit.display_repo }}</span>
+                                    {% if commit.article %}
+                                        <a class="notebook-commit-repo is-linked"
+                                           href="{{ commit.article.get_absolute_url }}"
+                                           title="看这个项目的文章">{{ commit.display_repo }}</a>
+                                    {% else %}
+                                        <span class="notebook-commit-repo">{{ commit.display_repo }}</span>
+                                    {% endif %}
                                     {% if commit.visible_summary %}
                                         <code class="notebook-commit-sha">{{ commit.short_sha }}</code>
                                     {% endif %}

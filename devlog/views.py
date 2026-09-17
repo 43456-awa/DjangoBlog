@@ -4,11 +4,34 @@ from datetime import date, datetime, time, timedelta
 from django.shortcuts import render
 from django.utils import timezone
 
+from blog.models import Article
+
 from .models import GitCommit
 
 HEATMAP_WEEKS = 53
 TIMELINE_DAYS = 365
 TIMELINE_LIMIT = 600
+
+# 仓库 → 对应文章的标题关键词（用关键词而不是 id，文章重建后依然能对上）
+REPO_ARTICLE_KEYWORDS = {
+    'auto-eval-app': '青课',
+    'doudou-ledger': '豆豆记账',
+    'usage-gateway': '用量账簿',
+    'automods-lite': '模组工作台',
+    'desktop-pet': '桌宠',
+}
+
+
+def _repo_article_map():
+    """把仓库名映射到文章对象，页面上项目名就能点进去。"""
+    mapping = {}
+    for repo, keyword in REPO_ARTICLE_KEYWORDS.items():
+        article = (
+            Article.objects.filter(status='p', title__contains=keyword).order_by('id').first()
+        )
+        if article:
+            mapping[repo] = article
+    return mapping
 
 
 def _local_date(dt):
@@ -64,9 +87,11 @@ def changelog(request):
 
     cutoff = datetime.combine(today - timedelta(days=TIMELINE_DAYS), time.min)
     timeline = commits.filter(committed_at__gte=cutoff)
+    repo_articles = _repo_article_map()
     shown = 0
     groups = OrderedDict()
     for commit in timeline[:TIMELINE_LIMIT]:
+        commit.article = repo_articles.get(commit.repo)
         groups.setdefault(_local_date(commit.committed_at), []).append(commit)
         shown += 1
 
