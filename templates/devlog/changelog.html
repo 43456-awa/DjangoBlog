@@ -107,11 +107,18 @@
             var heat = document.querySelector('.notebook-heat');
             if (!tip || !heat) return;
 
-            function hide() { tip.hidden = true; }
+            var active = null;
 
-            heat.addEventListener('mouseover', function (event) {
-                var cell = event.target.closest('.notebook-heat-cell');
-                if (!cell || cell.classList.contains('is-empty')) { hide(); return; }
+            function hide() {
+                tip.hidden = true;
+                if (active) {
+                    active.classList.remove('is-active');
+                    active = null;
+                }
+            }
+
+            function show(cell) {
+                if (active === cell) return;
 
                 tip.innerHTML = '';
                 var title = document.createElement('strong');
@@ -134,18 +141,52 @@
                     tip.appendChild(list);
                 }
 
+                if (active) active.classList.remove('is-active');
+                cell.classList.add('is-active');
+                active = cell;
+
                 tip.hidden = false;
+
                 var box = cell.getBoundingClientRect();
-                var left = box.left + window.scrollX + box.width / 2 - tip.offsetWidth / 2;
+                var viewLeft = window.scrollX;
+                var viewRight = viewLeft + document.documentElement.clientWidth;
+                var left = box.left + viewLeft + box.width / 2 - tip.offsetWidth / 2;
+                left = Math.min(Math.max(viewLeft + 8, left), viewRight - tip.offsetWidth - 8);
+
                 var top = box.top + window.scrollY - tip.offsetHeight - 8;
                 if (top < window.scrollY) {
                     top = box.bottom + window.scrollY + 8;
                 }
-                tip.style.left = Math.max(8, left) + 'px';
+                tip.style.left = left + 'px';
                 tip.style.top = top + 'px';
+            }
+
+            function cellFrom(event) {
+                var cell = event.target.closest('.notebook-heat-cell');
+                if (!cell || cell.classList.contains('is-empty')) return null;
+                return cell;
+            }
+
+            /* 桌面：鼠标悬停 */
+            heat.addEventListener('mouseover', function (event) {
+                var cell = cellFrom(event);
+                if (cell) { show(cell); } else { hide(); }
+            });
+            heat.addEventListener('mouseout', hide);
+
+            /* 触摸屏：手机没有 hover，点一下格子看详情，点空白收起 */
+            heat.addEventListener('click', function (event) {
+                var cell = cellFrom(event);
+                if (!cell) { hide(); return; }
+                if (active === cell) { hide(); } else { show(cell); }
+                event.stopPropagation();
+            });
+            document.addEventListener('click', function (event) {
+                var target = event.target;
+                if (!target || typeof target.closest !== 'function') { hide(); return; }
+                if (!target.closest('.notebook-heat')) hide();
             });
 
-            heat.addEventListener('mouseout', hide);
             window.addEventListener('scroll', hide, {passive: true});
         })();
     </script>
