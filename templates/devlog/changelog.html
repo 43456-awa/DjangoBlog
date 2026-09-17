@@ -63,6 +63,9 @@
             </section>
 
             <section class="notebook-timeline" aria-label="提交时间线">
+                <p class="notebook-timeline-hint">
+                    近 {{ timeline_days }} 天共 {{ timeline_total }} 条提交{% if timeline_shown < timeline_total %}，此处显示最近 {{ timeline_shown }} 条{% endif %}
+                </p>
                 {% for day, items in groups %}
                     <h2 class="notebook-timeline-day">{{ day|date:"Y年n月j日" }}</h2>
                     <ul class="notebook-timeline-list">

@@ -1,5 +1,5 @@
 from collections import Counter, OrderedDict
-from datetime import date, timedelta
+from datetime import date, datetime, time, timedelta
 
 from django.shortcuts import render
 from django.utils import timezone
@@ -7,6 +7,8 @@ from django.utils import timezone
 from .models import GitCommit
 
 HEATMAP_WEEKS = 53
+TIMELINE_DAYS = 365
+TIMELINE_LIMIT = 600
 
 
 def _local_date(dt):
@@ -60,9 +62,13 @@ def changelog(request):
             'future': day > today,
         })
 
+    cutoff = datetime.combine(today - timedelta(days=TIMELINE_DAYS), time.min)
+    timeline = commits.filter(committed_at__gte=cutoff)
+    shown = 0
     groups = OrderedDict()
-    for commit in commits[:200]:
+    for commit in timeline[:TIMELINE_LIMIT]:
         groups.setdefault(_local_date(commit.committed_at), []).append(commit)
+        shown += 1
 
     return render(request, 'devlog/changelog.html', {
         'total': total,
@@ -71,4 +77,7 @@ def changelog(request):
         'latest': latest,
         'heatmap': heatmap,
         'groups': groups.items(),
+        'timeline_total': timeline.count(),
+        'timeline_shown': shown,
+        'timeline_days': TIMELINE_DAYS,
     })

@@ -256,6 +256,7 @@
 /* 图例里的方块必须固定尺寸：格子在网格里是 width:100%，放进 flex 会被拉成整行宽 */
 .notebook-heat-legend .notebook-heat-cell { flex: 0 0 11px; width: 11px; height: 11px; aspect-ratio: auto; }
 
+.notebook-timeline-hint { margin: 0; color: rgb(var(--muted-foreground)); font-size: 11px; letter-spacing: .04em; }
 .notebook-timeline-day { margin: 0 0 4px; padding: 14px 0 8px; color: rgb(var(--muted-foreground)); font-size: 12px; letter-spacing: .06em; border-bottom: 1px solid rgb(var(--border)); }
 .notebook-timeline-list { margin: 0 0 8px; padding: 0; list-style: none; }
 .notebook-commit { padding: 14px 0; border-bottom: 1px solid rgb(var(--border) / .55); }
