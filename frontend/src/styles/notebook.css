@@ -247,6 +247,8 @@ html:not([data-theme="dark"]) .yukika-site {
 /* 用 fixed：absolute 会相对最近的定位祖先算坐标，浮层会飘到别处 */
 .notebook-heat-tip { position: fixed; z-index: 60; max-width: 280px; padding: 10px 13px; border: 1px solid rgb(var(--border)); border-radius: 10px; background: rgb(var(--card)); box-shadow: 0 8px 24px rgba(20, 16, 28, .12); font-size: 12px; line-height: 1.7; pointer-events: none; }
 .notebook-timeline-day { scroll-margin-top: 80px; transition: background-color .3s ease; }
+/* 页面内锚点跳转统一平滑（JS 里用即时滚动，动画交给这里，兼容性更稳） */
+html { scroll-behavior: smooth; }
 .notebook-timeline-day.is-flash { background: rgb(var(--primary) / .12); box-shadow: inset 3px 0 0 rgb(var(--primary)); padding-left: 10px; }
 .notebook-heat-tip strong { display: block; font-size: 12px; font-weight: 500; color: rgb(var(--foreground)); }
 .notebook-heat-tip > span { display: block; margin-top: 2px; font-size: 11px; color: rgb(var(--muted-foreground)); }
