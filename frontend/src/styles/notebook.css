@@ -1,5 +1,6 @@
-/* Yukika's notebook: presentation only, built on DjangoBlog's theme tokens. */
-.yukika-site {
+/* Yukika's notebook: presentation only, built on DjangoBlog's theme tokens.
+ * 浅色主题变量只在非深色下生效——否则会被深色模式继承的同名变量盖掉 */
+html:not([data-theme="dark"]) .yukika-site {
   --background: 247 246 242;
   --foreground: 43 42 51;
   --card: 255 254 251;
