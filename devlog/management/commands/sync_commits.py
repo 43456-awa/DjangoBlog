@@ -78,6 +78,10 @@ class Command(BaseCommand):
                 continue
 
             since = since_override or cfg.get('since') or ''
+            # git 对纯日期（2026-09-17）会用「当前时刻」补全时间部分，
+            # 结果是当天早些的提交被 --since 过滤掉，所以统一补成 00:00:00
+            if re.fullmatch(r'\d{4}-\d{2}-\d{2}', since):
+                since = f'{since} 00:00:00'
             branches = cfg.get('branches') or []
             entries = self._read_git_log(path, since, branches)
             new_count = 0
