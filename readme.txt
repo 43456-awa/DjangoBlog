@@ -5,3 +5,5 @@
 >>>>>>> gitee/lyw_branch
 姓名：刘定义，学号：2415304326，班级：3班
 >>>>>>> gitee/ldy_branch
+姓名：王叶权，学号：2415304325，班级：3班
+>>>>>>> gitee/wyq_branch
