@@ -42,12 +42,20 @@
                     {% for cell in heatmap %}
                         {% if cell.future %}
                             <span class="notebook-heat-cell is-empty" aria-hidden="true"></span>
+                        {% elif cell.count %}
+                            {# 有提交的日子做成真链接，跳转交给浏览器，不依赖 JS #}
+                            <a class="notebook-heat-cell" href="#day-{{ cell.date|date:"Y-m-d" }}"
+                               data-level="{{ cell.level }}"
+                               data-date="{{ cell.date|date:"Y 年 n 月 j 日" }}"
+                               data-iso="{{ cell.date|date:"Y-m-d" }}"
+                               data-count="{{ cell.count }}"
+                               data-detail="{{ cell.detail|join:"||" }}"></a>
                         {% else %}
-                            <span class="notebook-heat-cell" data-level="{{ cell.level }}"
+                            <span class="notebook-heat-cell" data-level="0"
                                   data-date="{{ cell.date|date:"Y 年 n 月 j 日" }}"
                                   data-iso="{{ cell.date|date:"Y-m-d" }}"
-                                  data-count="{{ cell.count }}"
-                                  data-detail="{{ cell.detail|join:"||" }}"></span>
+                                  data-count="0"
+                                  data-detail=""></span>
                         {% endif %}
                     {% endfor %}
                 </div>
@@ -182,22 +190,14 @@
             });
             heat.addEventListener('mouseout', hide);
 
-            /* 点格子：第一次看详情（手机上没有 hover，只能靠点），第二次跳到那一天 */
+            /* 有提交的日子是 <a href="#day-...">，跳转交给浏览器原生处理（最稳）；
+               没提交的日子还是 span，点一下给个提示 */
             heat.addEventListener('click', function (event) {
                 var cell = cellFrom(event);
                 if (!cell) { hide(); return; }
+                if (cell.tagName === 'A') { hide(); return; }
                 event.stopPropagation();
-
-                if (active !== cell) { show(cell); return; }
-
-                var target = document.getElementById('day-' + cell.dataset.iso);
-                if (!target) { return; }   /* 这天没有提交，留在浮层提示上 */
-                hide();
-                /* 用 scrollTo 而不是 scrollIntoView：后者在部分环境不生效 */
-                var top = target.getBoundingClientRect().top + window.scrollY - 80;
-                window.scrollTo(0, top);
-                target.classList.add('is-flash');
-                setTimeout(function () { target.classList.remove('is-flash'); }, 1800);
+                if (active !== cell) { show(cell); } else { hide(); }
             });
             document.addEventListener('click', function (event) {
                 var target = event.target;
