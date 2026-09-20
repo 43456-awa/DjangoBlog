@@ -9,6 +9,22 @@
 > | 分支约定 | `master` 保存稳定版本；成员分支按「姓名首字母_branch」命名（如 `zyc_branch`） |
 > | 目录约定 | `doc/` 存放报告文档；`src/` 存放小组自主开发代码（源码结构沿用上游，见 `src/README.md`） |
 > | 项目文档 | [`doc/项目说明.md`](doc/项目说明.md) |
+> | 小组 | **南京理工大学紫金学院 · 软件工程 3 班 7 组** |
+
+### 👥 小组成员
+
+| 姓名 | 学号 | 成员分支 |
+|---|---|---|
+| 曾叶程（组长） | 2415304327 | `zyc_branch` |
+| 甘雨 | 2415304329 | `gy_branch` |
+| 刘运武 | 2415304342 | `lyw_branch` |
+| 刘定义 | 2415304326 | `ldy_branch` |
+| 王叶权 | 2415304325 | `wyq_branch` |
+| 柴启航 | 2415304328 | `cqh_branch` |
+
+> ⚠️ **关于右侧「贡献者」列表**：本仓库基于上游开源项目 DjangoBlog 二次开发，
+> 该列表包含**上游作者的历史提交**（前两名各 600 余次），本组提交混在其后，排序由平台自动生成、无法调整。
+> **本组的开发成果请以上表成员及其成员分支为准。**
 
 <p align="center">
   <a href="https://github.com/liangliangyy/DjangoBlog/actions/workflows/django.yml"><img src="https://github.com/liangliangyy/DjangoBlog/actions/workflows/django.yml/badge.svg" alt="Django CI"></a>
