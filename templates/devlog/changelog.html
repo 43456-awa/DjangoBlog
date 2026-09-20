@@ -183,12 +183,14 @@
                 return cell;
             }
 
-            /* 桌面：鼠标悬停 */
+            /* 桌面：鼠标悬停。
+               注意用 mouseleave 而不是 mouseout —— mouseout 会冒泡，
+               鼠标从格子挪到相邻格子或格子间缝隙时都会触发，浮层会立刻消失 */
             heat.addEventListener('mouseover', function (event) {
                 var cell = cellFrom(event);
-                if (cell) { show(cell); } else { hide(); }
+                if (cell) show(cell);   /* 移到缝隙上不隐藏，保持显示上一个格子 */
             });
-            heat.addEventListener('mouseout', hide);
+            heat.addEventListener('mouseleave', hide);
 
             /* 有提交的日子是 <a href="#day-...">，跳转交给浏览器原生处理（最稳）；
                没提交的日子还是 span，点一下给个提示 */

@@ -23,13 +23,10 @@
         </a>
 
         {# Desktop Nav #}
+        {# 不用 hx-boost：那只会替换 #main，导航自身不重新渲染，
+           而高亮是服务端按 request.path 渲染的 → 会永远停在首次进入的那一页 #}
         <nav class="hidden flex-1 items-center gap-0.5 lg:flex"
-             aria-label="{% trans 'Primary' %}"
-             hx-boost="true"
-             hx-target="#main"
-             hx-select="#main"
-             hx-swap="innerHTML"
-             hx-push-url="true">
+             aria-label="{% trans 'Primary' %}">
             {% current_nav_item request as nav_active %}
             <a href="{% url 'blog:index' %}"
                class="relative rounded-lg px-3.5 py-2 text-sm font-medium transition-all duration-200 hover:bg-secondary hover:text-foreground {% if nav_active == 'index' %}text-primary bg-primary/5{% else %}text-muted-foreground{% endif %}"
@@ -178,12 +175,7 @@
          x-transition:leave-start="opacity-100 translate-y-0"
          x-transition:leave-end="opacity-0 -translate-y-2"
          class="border-t border-border/60 bg-background/95 px-4 py-2 backdrop-blur-xl lg:hidden"
-         x-cloak
-         hx-boost="true"
-         hx-target="#main"
-         hx-select="#main"
-         hx-swap="innerHTML"
-         hx-push-url="true">
+         x-cloak>
         <div class="flex flex-col gap-0.5">
 
             {# Mobile search #}
