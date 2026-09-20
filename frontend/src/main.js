@@ -5,6 +5,7 @@
 
 // 导入样式文件（Vite开发模式必需）
 import './styles/main.css';
+import './styles/notebook.css';
 
 import Alpine from 'alpinejs';
 import focus from '@alpinejs/focus';

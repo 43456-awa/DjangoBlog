@@ -9,43 +9,66 @@
 {% endblock %}
 
 {% block content %}
-    <div class="mx-auto max-w-6xl px-4 py-4 lg:px-6 lg:py-6">
+    <div class="notebook-shell {% if not page_type %}notebook-index{% endif %} mx-auto max-w-6xl px-4 py-4 lg:px-6 lg:py-6">
+        {% if not page_type %}
+        <section class="notebook-intro" aria-labelledby="notebook-title">
+            <div class="notebook-intro-copy">
+                <p class="notebook-eyebrow"><span aria-hidden="true"></span> {{ SITE_NAME }} / 开发手记</p>
+                <h1 id="notebook-title">把想法写成代码，<br>把过程留在这里<span class="notebook-title-dot">。</span></h1>
+                <p class="notebook-intro-description">做一些有用的小东西，记录从想法到实现的每一步。</p>
+                <a class="notebook-text-link" href="{% url 'blog:archives' %}">翻翻文章归档 <span aria-hidden="true">↗</span></a>
+            </div>
+            <div class="notebook-intro-art" aria-hidden="true">
+                <svg class="notebook-orbit" viewBox="0 0 300 230" fill="none">
+                    <ellipse cx="148" cy="113" rx="125" ry="64" transform="rotate(-28 148 113)"/>
+                    <ellipse cx="148" cy="113" rx="83" ry="105" transform="rotate(-28 148 113)"/>
+                    <path d="M148 26v174M58 113h180" stroke-dasharray="3 7"/>
+                    <circle cx="238" cy="67" r="6" class="notebook-orbit-dot"/>
+                </svg>
+                <span class="notebook-monogram">{{ SITE_NAME|first }}.</span>
+                <span class="notebook-art-caption">BUILD · LEARN · SHARE</span>
+            </div>
+        </section>
+        {% endif %}
         {# Main Grid #}
-        <div class="grid gap-6 lg:grid-cols-[1fr_300px]">
+        <div class="notebook-grid grid gap-6 lg:grid-cols-[1fr_300px]">
             {# Main Content #}
-            <main>
+            <main class="min-w-0">
                 {# Title Section #}
-                <div class="mb-6">
+                <div class="notebook-section-heading mb-6">
                     {% if page_type == "分类目录归档" %}
                         <p class="mb-1 text-xs text-muted-foreground">分类</p>
-                        <h2 class="flex items-center gap-2 text-xl font-bold text-foreground m-0">
+                        <h1 class="flex items-center gap-2 text-xl font-bold text-foreground m-0">
                             <span class="h-5 w-1 shrink-0 rounded-full bg-primary"></span>
                             {{ tag_name }}
-                        </h2>
+                        </h1>
                     {% elif page_type == "分类标签归档" %}
                         <p class="mb-1 text-xs text-muted-foreground">标签</p>
-                        <h2 class="flex items-center gap-2 text-xl font-bold text-foreground m-0">
+                        <h1 class="flex items-center gap-2 text-xl font-bold text-foreground m-0">
                             <span class="h-5 w-1 shrink-0 rounded-full bg-primary"></span>
                             {{ tag_name }}
-                        </h2>
+                        </h1>
                     {% elif page_type == "作者文章归档" %}
                         <p class="mb-1 text-xs text-muted-foreground">作者</p>
-                        <h2 class="flex items-center gap-2 text-xl font-bold text-foreground m-0">
+                        <h1 class="flex items-center gap-2 text-xl font-bold text-foreground m-0">
                             <span class="h-5 w-1 shrink-0 rounded-full bg-primary"></span>
                             {{ tag_name }}
-                        </h2>
+                        </h1>
                     {% else %}
                         <h2 class="flex items-center gap-2 text-xl font-bold text-foreground m-0">
                             <span class="h-5 w-1 shrink-0 rounded-full bg-primary"></span>
                             {% trans 'recent articles' %}
                         </h2>
+                        <span class="notebook-section-note">RECENT NOTES</span>
                     {% endif %}
                 </div>
 
                 {# Article List #}
-                <div class="flex flex-col gap-5">
+                <div class="notebook-article-list flex flex-col gap-5">
                     {% for article in article_list %}
                         {% load_article_detail article True user %}
+                    {% empty %}
+                        <p class="notebook-empty">这里暂时还没有文章。</p>
                     {% endfor %}
                 </div>
 

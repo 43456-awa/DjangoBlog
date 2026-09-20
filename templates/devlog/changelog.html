@@ -1,0 +1,211 @@
+{% extends 'share_layout/base.html' %}
+{% load i18n %}
+
+{% block header %}
+    <title>{% trans '开发动态' %} · {{ SITE_NAME }}</title>
+    <meta name="description" content="{{ SITE_NAME }} 的开发提交记录"/>
+{% endblock %}
+
+{% block content %}
+    <div class="notebook-shell notebook-index mx-auto max-w-6xl px-4 py-4 lg:px-6 lg:py-6">
+        <div class="notebook-changelog">
+
+            <div class="notebook-changelog-head">
+                <div>
+                    <p class="notebook-eyebrow"><span aria-hidden="true"></span> {{ SITE_NAME }} / 开发动态</p>
+                    <h1>最近在写什么</h1>
+                    <p class="notebook-changelog-note">只记录本仓库与本机项目的提交，上游历史已过滤；私有项目的改动细节不会展示。</p>
+                </div>
+                {% if latest %}
+                    <span class="notebook-changelog-latest">最近提交 {{ latest.committed_at|date:"n月j日" }}</span>
+                {% endif %}
+            </div>
+
+            <div class="notebook-stat-grid">
+                <div class="notebook-stat">
+                    <span class="notebook-stat-label">提交总数</span>
+                    <strong class="notebook-stat-value">{{ total }}</strong>
+                </div>
+                <div class="notebook-stat">
+                    <span class="notebook-stat-label">参与项目</span>
+                    <strong class="notebook-stat-value">{{ repo_count }}</strong>
+                </div>
+                <div class="notebook-stat">
+                    <span class="notebook-stat-label">近 7 天</span>
+                    <strong class="notebook-stat-value">{{ week_count }}</strong>
+                </div>
+            </div>
+
+            <section class="notebook-heat-card" aria-label="提交密度">
+                <p class="notebook-heat-title">近一年提交密度</p>
+                <div class="notebook-heat" role="img" aria-label="提交热力图">
+                    {% for cell in heatmap %}
+                        {% if cell.future %}
+                            <span class="notebook-heat-cell is-empty" aria-hidden="true"></span>
+                        {% elif cell.count %}
+                            {# 有提交的日子做成真链接，跳转交给浏览器，不依赖 JS #}
+                            <a class="notebook-heat-cell" href="#day-{{ cell.date|date:"Y-m-d" }}"
+                               data-level="{{ cell.level }}"
+                               data-date="{{ cell.date|date:"Y 年 n 月 j 日" }}"
+                               data-iso="{{ cell.date|date:"Y-m-d" }}"
+                               data-count="{{ cell.count }}"
+                               data-detail="{{ cell.detail|join:"||" }}"></a>
+                        {% else %}
+                            <span class="notebook-heat-cell" data-level="0"
+                                  data-date="{{ cell.date|date:"Y 年 n 月 j 日" }}"
+                                  data-iso="{{ cell.date|date:"Y-m-d" }}"
+                                  data-count="0"
+                                  data-detail=""></span>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <div class="notebook-heat-legend">
+                    <span>少</span>
+                    <i class="notebook-heat-cell" data-level="0"></i>
+                    <i class="notebook-heat-cell" data-level="1"></i>
+                    <i class="notebook-heat-cell" data-level="2"></i>
+                    <i class="notebook-heat-cell" data-level="3"></i>
+                    <i class="notebook-heat-cell" data-level="4"></i>
+                    <span>多</span>
+                </div>
+                <div class="notebook-heat-tip" id="heatTip" hidden></div>
+            </section>
+
+            <section class="notebook-timeline" aria-label="提交时间线">
+                <p class="notebook-timeline-hint">
+                    近 {{ timeline_days }} 天共 {{ timeline_total }} 条提交{% if timeline_shown < timeline_total %}，此处显示最近 {{ timeline_shown }} 条{% endif %}
+                </p>
+                {% for day, items in groups %}
+                    <h2 class="notebook-timeline-day" id="day-{{ day|date:"Y-m-d" }}">{{ day|date:"Y年n月j日" }}</h2>
+                    <ul class="notebook-timeline-list">
+                        {% for commit in items %}
+                            <li class="notebook-commit">
+                                <div class="notebook-commit-top">
+                                    {% if commit.commit_type %}
+                                        <span class="notebook-commit-type" data-type="{{ commit.commit_type }}">{{ commit.commit_type }}</span>
+                                    {% endif %}
+                                    {% if commit.article %}
+                                        <a class="notebook-commit-repo is-linked"
+                                           href="{{ commit.article.get_absolute_url }}"
+                                           title="看这个项目的文章">{{ commit.display_repo }}</a>
+                                    {% else %}
+                                        <span class="notebook-commit-repo">{{ commit.display_repo }}</span>
+                                    {% endif %}
+                                    {% if commit.visible_summary %}
+                                        <code class="notebook-commit-sha">{{ commit.short_sha }}</code>
+                                    {% endif %}
+                                </div>
+                                {% if commit.visible_summary %}
+                                    <p class="notebook-commit-summary">{{ commit.visible_summary }}</p>
+                                {% else %}
+                                    <p class="notebook-commit-summary is-muted">一次代码更新</p>
+                                {% endif %}
+                                <p class="notebook-commit-meta">
+                                    {{ commit.committed_at|date:"H:i" }}
+                                    {% if not commit.is_private %}
+                                        · {{ commit.files_changed }} 个文件
+                                        · <span class="is-add">+{{ commit.insertions }}</span>
+                                        <span class="is-del">−{{ commit.deletions }}</span>
+                                    {% endif %}
+                                </p>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% empty %}
+                    <p class="notebook-empty">还没有同步任何提交。</p>
+                {% endfor %}
+            </section>
+
+        </div>
+    </div>
+
+    <script>
+        (function () {
+            var tip = document.getElementById('heatTip');
+            var heat = document.querySelector('.notebook-heat');
+            if (!tip || !heat) return;
+
+            var active = null;
+
+            function hide() {
+                tip.hidden = true;
+                if (active) {
+                    active.classList.remove('is-active');
+                    active = null;
+                }
+            }
+
+            function show(cell) {
+                if (active === cell) return;
+
+                tip.innerHTML = '';
+                var title = document.createElement('strong');
+                title.textContent = cell.dataset.date;
+                tip.appendChild(title);
+
+                var count = parseInt(cell.dataset.count || '0', 10);
+                var meta = document.createElement('span');
+                meta.textContent = count ? count + ' 次提交' : '这一天没有提交';
+                tip.appendChild(meta);
+
+                var items = (cell.dataset.detail || '').split('||').filter(Boolean);
+                if (items.length) {
+                    var list = document.createElement('ul');
+                    items.forEach(function (text) {
+                        var li = document.createElement('li');
+                        li.textContent = text;
+                        list.appendChild(li);
+                    });
+                    tip.appendChild(list);
+                }
+
+                if (active) active.classList.remove('is-active');
+                cell.classList.add('is-active');
+                active = cell;
+
+                tip.hidden = false;
+
+                // 浮层是 position: fixed，坐标直接用视口坐标，不受祖先定位影响
+                var box = cell.getBoundingClientRect();
+                var left = box.left + box.width / 2 - tip.offsetWidth / 2;
+                left = Math.min(Math.max(8, left), window.innerWidth - tip.offsetWidth - 8);
+                var top = box.top - tip.offsetHeight - 8;
+                if (top < 8) {
+                    top = box.bottom + 8;
+                }
+                tip.style.left = left + 'px';
+                tip.style.top = top + 'px';
+            }
+
+            function cellFrom(event) {
+                var cell = event.target.closest('.notebook-heat-cell');
+                if (!cell || cell.classList.contains('is-empty')) return null;
+                return cell;
+            }
+
+            /* 桌面：鼠标悬停 */
+            heat.addEventListener('mouseover', function (event) {
+                var cell = cellFrom(event);
+                if (cell) { show(cell); } else { hide(); }
+            });
+            heat.addEventListener('mouseout', hide);
+
+            /* 有提交的日子是 <a href="#day-...">，跳转交给浏览器原生处理（最稳）；
+               没提交的日子还是 span，点一下给个提示 */
+            heat.addEventListener('click', function (event) {
+                var cell = cellFrom(event);
+                if (!cell) { hide(); return; }
+                if (cell.tagName === 'A') { hide(); return; }
+                event.stopPropagation();
+                if (active !== cell) { show(cell); } else { hide(); }
+            });
+            document.addEventListener('click', function (event) {
+                var target = event.target;
+                if (!target || typeof target.closest !== 'function') { hide(); return; }
+                if (!target.closest('.notebook-heat')) hide();
+            });
+
+            window.addEventListener('scroll', hide, {passive: true});
+        })();
+    </script>
+{% endblock %}

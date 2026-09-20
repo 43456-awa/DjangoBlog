@@ -2,10 +2,10 @@
 {% load cache %}
 {% load i18n %}
 
-<article id="post-{{ article.pk }}" class="group overflow-hidden rounded-xl border border-border bg-card p-4 shadow-sm">
+<article id="post-{{ article.pk }}" class="notebook-article-card group overflow-hidden rounded-xl border border-border bg-card p-4 shadow-sm">
 
     {# Top: Category & Date #}
-    <div class="mb-2.5 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+    <div class="notebook-card-meta mb-2.5 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
         <a href="{{ article.category.get_absolute_url }}"
            class="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary transition-colors hover:bg-primary/20">
             {{ article.category.name }}
@@ -19,7 +19,7 @@
     </div>
 
     {# Title #}
-    <h2 class="mb-2 m-0 text-xl font-bold leading-snug tracking-tight text-foreground sm:text-2xl">
+    <h2 class="notebook-card-title mb-2 m-0 text-xl font-bold leading-snug tracking-tight text-foreground sm:text-2xl">
         {% if isindex %}
             <a href="{{ article.get_absolute_url }}"
                class="transition-colors hover:text-primary"
@@ -48,17 +48,15 @@
 
     {# Excerpt (List page only) #}
     {% if isindex %}
-        <div class="relative mb-3 sm:mb-4">
-            <div class="article-excerpt prose prose-sm dark:prose-invert max-w-none max-h-40 overflow-hidden sm:max-h-none">
+        <div class="notebook-excerpt-wrap relative mb-3 sm:mb-4">
+            <div class="article-excerpt notebook-excerpt prose prose-sm dark:prose-invert max-w-none">
                 {% render_article_content article True %}
             </div>
-            {# Fade-out on mobile only — hidden on sm+ #}
-            <div class="pointer-events-none absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-card to-transparent sm:hidden"></div>
         </div>
     {% endif %}
 
     {# Bottom: Tags & Stats #}
-    <div class="flex flex-col gap-2.5 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between sm:gap-0">
+    <div class="notebook-card-bottom flex flex-col gap-2.5 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between sm:gap-0">
         {# Tags #}
         <div class="flex flex-wrap gap-1.5">
             {% for tag in article.tags.all|slice:":3" %}
