@@ -91,3 +91,7 @@ specs/
 
 # 本机开发动态的私有仓库配置（含本地路径，不入库）
 djangoblog/commit_feed_local.py
+
+# 开发动态同步产生的本机数据
+usage.json
+devlog_data.json
