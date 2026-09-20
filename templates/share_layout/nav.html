@@ -23,8 +23,11 @@
         </a>
 
         {# Desktop Nav #}
-        {# 不用 hx-boost：那只会替换 #main，导航自身不重新渲染，
-           而高亮是服务端按 request.path 渲染的 → 会永远停在首次进入的那一页 #}
+        {% comment %}
+        不用 hx-boost：那只会替换 #main，导航自身不重新渲染，
+        而高亮是服务端按 request.path 渲染的 → 会永远停在首次进入的那一页。
+        注意：{# #} 只支持单行，多行注释必须用 comment 标签，否则会渲染到页面上。
+        {% endcomment %}
         <nav class="hidden flex-1 items-center gap-0.5 lg:flex"
              aria-label="{% trans 'Primary' %}">
             {% current_nav_item request as nav_active %}
